@@ -24,7 +24,7 @@ router.post('/sign-up', async (req, res, next) => {
     if (!userId || !password || !passwordCheck || !userName) {
       return res
         .status(400)
-        .json({ error: '사용자 정보를 모두 입력해 주시길 바랍니다.' });
+        .json({ error: '사용자 정보를 모두 입력해 주세요.' });
     }
 
     // ID 유효성 검사
@@ -105,13 +105,13 @@ router.post('/sign-in', async (req, res, next) => {
     if (!userId || !password) {
       return res
         .status(400)
-        .json({ error: '로그인 정보를 모두 입력해 주시길 바랍니다.' });
+        .json({ error: '로그인 정보를 모두 입력해 주세요.' });
     }
 
     // 일치하는 ID와 비밀번호가 존재하는지 검사
     // 아이디가 존재하지 않는 경우
     // 비밀번호가 틀린 경우
-    const user = await prisma.users.findFirst({
+    const user = await prisma.accounts.findFirst({
       where: { userId },
     });
     if (!user) {
@@ -142,7 +142,7 @@ router.post('/sign-in', async (req, res, next) => {
 function createAccessToken(userId) {
   const accessToken = jwt.sign(
     { userId: userId }, // JWT 데이터
-    ACCESS_TOKEN_SECRET_KEY, // Access Token의 비밀 키
+    process.env.ACCESS_TOKEN_SECRET_KEY, // Access Token의 비밀 키
     { expiresIn: '10s' }, // Access Token이 10초 뒤에 만료되도록 설정합니다.
   );
 
@@ -152,7 +152,7 @@ function createAccessToken(userId) {
 function createRefreshToken(userId) {
   const refreshToken = jwt.sign(
     { userId: userId }, // JWT 데이터
-    REFRESH_TOKEN_SECRET_KEY, // Refresh Token의 비밀 키
+    process.env.REFRESH_TOKEN_SECRET_KEY, // Refresh Token의 비밀 키
     { expiresIn: '7d' }, // Refresh Token이 7일 뒤에 만료되도록 설정합니다.
   );
 

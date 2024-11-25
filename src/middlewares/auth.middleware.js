@@ -60,7 +60,9 @@ export default async function (req, res, next) {
     // 에러 처리
     switch (error.name) {
       case 'TokenExpiredError':
-        return res.status(401).json({ message: '토큰이 만료되었습니다. 재로그인이 필요합니다.' });
+        return res
+          .status(401)
+          .json({ message: '토큰이 만료되었습니다. 재로그인이 필요합니다.' });
       case 'JsonWebTokenError':
         return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
       default:

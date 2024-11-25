@@ -48,9 +48,10 @@ model Characters{
   characterName String @unique @map("characterName")
   characterHp BigInt @map("characterHp")
   characterPower BigInt @map("characterPower")
+  characterSpeed Int @map("characterSpeed")
   characterMoney BigInt @map("characterMoney")
   accountId BigInt @map("accountId")
-  classId Int? @map("classId")
+  classId Int? @map("classId") // 캐릭터 생성 시 필수 입력값이지만 특정 클래스가 없어질 가능성이 존재
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
@@ -66,6 +67,9 @@ model Characters{
 model Classes{
   classId Int @id @default(autoincrement()) @map("classId")
   className String @unique @map("className")
+  classHp BigInt @map("classHp")
+  classPower BigInt @map("classPower")
+  classSpeed Int @map("classSpeed")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
