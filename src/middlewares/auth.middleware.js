@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import { prisma } from '../utils/prisma/index.js';
 
 dotenv.config();
@@ -24,7 +25,7 @@ export default async function (req, res, next) {
     // 3. JWT 검증
     let decodedToken;
     try {
-      decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      decodedToken = jwt.verify(token, process.env.TOKEN_SECRET_KEY);
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         return res.status(401).json({ message: '토큰이 만료되었습니다.' });
@@ -42,7 +43,7 @@ export default async function (req, res, next) {
 
     // 4. 계정 조회
     const user = await prisma.accounts.findFirst({
-      where: { userId: +userId },
+      where: { userId: userId },
     });
     if (!user) {
       return res
@@ -52,7 +53,7 @@ export default async function (req, res, next) {
 
     // 5. 인증 성공 시 사용자 정보 저장
     req.locals = req.locals || {};
-    req.locals.user = decodedToken;
+    req.locals.userId = decodedToken;
 
     // 6. 다음 미들웨어 실행
     next();

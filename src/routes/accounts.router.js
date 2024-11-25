@@ -1,5 +1,4 @@
 import express from 'express';
-import { Prisma } from '@prisma/client';
 import { prisma } from '../utils/prisma/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -123,12 +122,16 @@ router.post('/sign-in', async (req, res, next) => {
 
     // 로그인에 성공하면, 사용자의 userId를 바탕으로 토큰을 생성한다.
     // jwt.sign()을 이용해서 액세스 토큰과 리프레쉬 토큰 할당
-    const accessToken = createAccessToken(user.userId);
-    const refreshToken = createRefreshToken(user.userId);
+    const accessToken = jwt.sign(
+      { userId: user.userId },
+      process.env.TOKEN_SECRET_KEY,
+      {
+        expiresIn: '7d',
+      },
+    );
 
-    // authotization쿠키에 Bearer 토큰을 담아서 유저에게 응답합니다.
+    // accessToken쿠키에 Bearer 토큰을 담아서 유저에게 응답합니다.
     res.cookie('accessToken', `Bearer ${accessToken}`);
-    res.cookie('refreshToken', `Bearer ${refreshToken}`);
 
     return res
       .status(200)
@@ -139,24 +142,24 @@ router.post('/sign-in', async (req, res, next) => {
 });
 
 // Access Token을 생성하는 함수
-function createAccessToken(userId) {
-  const accessToken = jwt.sign(
-    { userId: userId }, // JWT 데이터
-    process.env.ACCESS_TOKEN_SECRET_KEY, // Access Token의 비밀 키
-    { expiresIn: '10s' }, // Access Token이 10초 뒤에 만료되도록 설정합니다.
-  );
+// function createAccessToken(userId) {
+//   const accessToken = jwt.sign(
+//     { userId: userId }, // JWT 데이터
+//     process.env.ACCESS_TOKEN_SECRET_KEY, // Access Token의 비밀 키
+//     { expiresIn: '10s' }, // Access Token이 10초 뒤에 만료되도록 설정합니다.
+//   );
 
-  return accessToken;
-}
-// Refresh Token을 생성하는 함수
-function createRefreshToken(userId) {
-  const refreshToken = jwt.sign(
-    { userId: userId }, // JWT 데이터
-    process.env.REFRESH_TOKEN_SECRET_KEY, // Refresh Token의 비밀 키
-    { expiresIn: '7d' }, // Refresh Token이 7일 뒤에 만료되도록 설정합니다.
-  );
+//   return accessToken;
+// }
+// // Refresh Token을 생성하는 함수
+// function createRefreshToken(userId) {
+//   const refreshToken = jwt.sign(
+//     { userId: userId }, // JWT 데이터
+//     process.env.REFRESH_TOKEN_SECRET_KEY, // Refresh Token의 비밀 키
+//     { expiresIn: '7d' }, // Refresh Token이 7일 뒤에 만료되도록 설정합니다.
+//   );
 
-  return refreshToken;
-}
+//   return refreshToken;
+// }
 
 export default router;

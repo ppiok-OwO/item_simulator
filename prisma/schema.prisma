@@ -15,28 +15,43 @@ datasource db {
 
 model Items{
   itemId Int @id @default(autoincrement()) @map("itemId")
-  itemName String @unique @map("itemName")
-  itemStat String @map("itemStat")
-  itemPrice BigInt @map("itemPrice")
+  itemCode Int @map("itemCode")
+  itemName String @map("itemName")
+  itemStat Json @map("itemStat")
+  itemPrice Int @map("itemPrice")
   classId Int? @map("classId") 
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
   class Classes? @relation(fields: [classId], references: [classId], onDelete: SetNull)
 
+  basicItem BasicItems?
   characterItem CharacterItems[]
   characterInventory CharacterInventory[]
 
   @@map("Items")
 }
 
+model BasicItems{
+  basicitemId Int @id @default(autoincrement()) @map("basicitemId")
+  itemId Int @unique @map("itemId")
+  classId Int @unique @map("classId")
+  createdAt DateTime @default(now()) @map("createdAt")
+  updatedAt DateTime @updatedAt @map("updatedAt")
+
+  item Items @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
+  class Classes @relation(fields: [classId], references: [classId], onDelete: Cascade)
+
+  @@map("BasicItems")
+}
+
 model Accounts{
-  accountId BigInt @id @default(autoincrement()) @map("accountId")
+  accountId Int @id @default(autoincrement()) @map("accountId")
   userId String @unique @map("userId")
   password String @map("password")
   userName String @map("userName")
   createdAt DateTime @default(now()) @map("createdAt")
-  updatedAt DateTime @updatedAt @map("updatedAt")
+  updatedAt DateTime @updatedAt @default(now()) @map("updatedAt")
 
   character Characters[]
 
@@ -44,13 +59,13 @@ model Accounts{
 }
 
 model Characters{
-  characterId BigInt @id @default(autoincrement()) @map("characterId")
+  characterId Int @id @default(autoincrement()) @map("characterId")
   characterName String @unique @map("characterName")
-  characterHp BigInt @map("characterHp")
-  characterPower BigInt @map("characterPower")
+  characterHp Int @map("characterHp")
+  characterPower Int @map("characterPower")
   characterSpeed Int @map("characterSpeed")
-  characterMoney BigInt @map("characterMoney")
-  accountId BigInt @map("accountId")
+  characterMoney Int @default( 10000) @map("characterMoney")
+  accountId Int @map("accountId")
   classId Int? @map("classId") // 캐릭터 생성 시 필수 입력값이지만 특정 클래스가 없어질 가능성이 존재
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
@@ -67,21 +82,22 @@ model Characters{
 model Classes{
   classId Int @id @default(autoincrement()) @map("classId")
   className String @unique @map("className")
-  classHp BigInt @map("classHp")
-  classPower BigInt @map("classPower")
+  classHp Int @map("classHp")
+  classPower Int @map("classPower")
   classSpeed Int @map("classSpeed")
   createdAt DateTime @default(now()) @map("createdAt")
-  updatedAt DateTime @updatedAt @map("updatedAt")
+  updatedAt DateTime? @updatedAt @map("updatedAt")
 
   item Items[]
+  basicItem BasicItems?
   character Characters[]
 
   @@map("Classes")
 }
 
 model CharacterItems{
-  characterItemId BigInt @id @default(autoincrement()) @map("characterItemId")
-  characterId BigInt @map("characterId")
+  characterItemId Int @id @default(autoincrement()) @map("characterItemId")
+  characterId Int @map("characterId")
   itemId Int @map("itemId")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
@@ -93,8 +109,8 @@ model CharacterItems{
 }
 
 model CharacterInventory{
-  characterInventoryId BigInt @id @default(autoincrement()) @map("characterInventoryId")
-  characterId BigInt @map("characterId")
+  characterInventoryId Int @id @default(autoincrement()) @map("characterInventoryId")
+  characterId Int @map("characterId")
   itemId Int @map("itemId")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
