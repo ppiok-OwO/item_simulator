@@ -1,3 +1,3 @@
--- SELECT * FROM `item_simulator`.`Accounts` LIMIT 1000;
+SELECT * FROM `item_simulator`.`Accounts` LIMIT 1000;
 
-DESC Accounts;
+-- DESC Accounts;

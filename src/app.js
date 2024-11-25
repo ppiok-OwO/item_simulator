@@ -1,5 +1,6 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import AccountsRouter from './routes/accounts.router.js';
 
 const app = express();
 const PORT = 3018;

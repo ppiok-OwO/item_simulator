@@ -3,6 +3,9 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '../utils/prisma/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const router = express.Router();
 
@@ -48,11 +51,13 @@ router.post('/sign-up', async (req, res, next) => {
         error:
           '사용자 비밀번호는 공백 없이 영어 소문자와 숫자의 조합으로만 구성되어야 합니다.',
       });
-    } else if (password.length < 6) {
+    }
+    if (password.length < 6) {
       return res.status(400).json({
         error: '사용자 비밀번호는 최소 6자리 이상이어야 합니다.',
       });
-    } else if (password !== passwordCheck) {
+    }
+    if (password !== passwordCheck) {
       return res.status(400).json({
         error: '비밀번호 확인이 일치하지 않습니다.',
       });
@@ -71,15 +76,15 @@ router.post('/sign-up', async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // DB에 회원가입 정보를 생성
-    const account = await prisma.accounts.create({
+    await prisma.accounts.create({
       data: {
         userId,
-        hashedPassword,
+        password: hashedPassword,
         userName,
       },
     });
 
-    return res.status(201).json({ message: '회원가입이 완료되었습니다.' });
+    return res.status(201).json({ data: { userId, userName } });
   } catch (err) {
     next(err);
   }
@@ -104,14 +109,54 @@ router.post('/sign-in', async (req, res, next) => {
     }
 
     // 일치하는 ID와 비밀번호가 존재하는지 검사
-    // 아이디가 존재하지 않는 겨우
+    // 아이디가 존재하지 않는 경우
+    // 비밀번호가 틀린 경우
     const user = await prisma.users.findFirst({
       where: { userId },
     });
     if (!user) {
-      res.status(401).json({ message: '존재하지 않는 이메일입니다.' });
+      res.status(401).json({ message: '존재하지 않는 ID입니다.' });
+    }
+    if (!(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ message: '잘못된 비밀번호입니다.' });
     }
 
-    // 비밀번호가 틀린 경우
-  } catch (err) {}
+    // 로그인에 성공하면, 사용자의 userId를 바탕으로 토큰을 생성한다.
+    // jwt.sign()을 이용해서 액세스 토큰과 리프레쉬 토큰 할당
+    const accessToken = createAccessToken(user.userId);
+    const refreshToken = createRefreshToken(user.userId);
+
+    // authotization쿠키에 Bearer 토큰을 담아서 유저에게 응답합니다.
+    res.cookie('accessToken', `Bearer ${accessToken}`);
+    res.cookie('refreshToken', `Bearer ${refreshToken}`);
+
+    return res
+      .status(200)
+      .json({ message: '로그인 성공. Token이 정상적으로 발급되었습니다.' });
+  } catch (err) {
+    next(err);
+  }
 });
+
+// Access Token을 생성하는 함수
+function createAccessToken(userId) {
+  const accessToken = jwt.sign(
+    { userId: userId }, // JWT 데이터
+    ACCESS_TOKEN_SECRET_KEY, // Access Token의 비밀 키
+    { expiresIn: '10s' }, // Access Token이 10초 뒤에 만료되도록 설정합니다.
+  );
+
+  return accessToken;
+}
+// Refresh Token을 생성하는 함수
+function createRefreshToken(userId) {
+  const refreshToken = jwt.sign(
+    { userId: userId }, // JWT 데이터
+    REFRESH_TOKEN_SECRET_KEY, // Refresh Token의 비밀 키
+    { expiresIn: '7d' }, // Refresh Token이 7일 뒤에 만료되도록 설정합니다.
+  );
+
+  return refreshToken;
+}
+
+export default router;
