@@ -11,7 +11,9 @@ export default async function (req, res, next) {
     const authorization = req.headers.authorization;
     if (!authorization || !authorization.trim()) {
       // authorization헤더가 비어있거나 빈칸만 존재할 경우
-      return res.status(401).json({ message: 'Authorization 헤더가 없습니다.' });
+      return res
+        .status(401)
+        .json({ message: 'Authorization 헤더가 없습니다.' });
     }
 
     // 2. Bearer 토큰 형식인지 확인
@@ -19,7 +21,9 @@ export default async function (req, res, next) {
     if (tokenType !== 'Bearer' || !token) {
       return res
         .status(400)
-        .json({ message: '토큰 타입이 Bearer 형식이 아니거나 누락되었습니다.' });
+        .json({
+          message: '토큰 타입이 Bearer 형식이 아니거나 누락되었습니다.',
+        });
     }
 
     // 3. JWT 검증
@@ -58,19 +62,7 @@ export default async function (req, res, next) {
 
     // 6. 다음 미들웨어 실행
     next();
-  } catch (error) {
-    // 에러 처리
-    switch (error.name) {
-      case 'TokenExpiredError':
-        return res
-          .status(401)
-          .json({ message: '토큰이 만료되었습니다. 재로그인이 필요합니다.' });
-      case 'JsonWebTokenError':
-        return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
-      default:
-        return res
-          .status(401)
-          .json({ message: error.message || '비정상적인 요청입니다.' });
-    }
+  } catch (err) {
+    next(err);
   }
 }

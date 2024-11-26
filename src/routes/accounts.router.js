@@ -125,7 +125,7 @@ router.post('/sign-in', async (req, res, next) => {
     }
 
     // 로그인에 성공하면, 사용자의 userId를 바탕으로 토큰을 생성한다.
-    // jwt.sign()을 이용해서 액세스 토큰과 리프레쉬 토큰 할당
+    // jwt.sign()을 이용해서 액세스 토큰 할당
     const accessToken = jwt.sign(
       { userId: user.userId },
       process.env.TOKEN_SECRET_KEY,

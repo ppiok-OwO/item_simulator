@@ -161,22 +161,53 @@ export async function equipItem(character, item) {
   });
 }
 
-/** 계정별 캐릭터 목록 조회 */
+/** 토큰 검증 함수 */
+async function verifyToken(authorization) {
+  if (!authorization || !authorization.trim()) return null;
 
-/** 캐릭터 상세 조회 API */
-router.get('/charaters/:characterId', async (req, res, next) => {
-  const { characterId } = req.params;
-  const authorization = req.headers.authorization;
+  const [tokenType, token] = authorization.split(' ');
+  if (tokenType !== 'Bearer' || !token) return null;
 
   try {
+    const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET_KEY);
+    const user = await prisma.accounts.findFirst({
+      where: { userId: decodedToken.userId },
+    });
+    return user || null;
+  } catch (error) {
+    return null; // 유효하지 않은 토큰 처리
+  }
+}
+
+/** 캐릭터 상세 조회 API */
+router.get('/characters/:characterId', async (req, res, next) => {
+  try {
+    const { characterId } = req.params;
+    const authorization = req.headers.authorization;
+
+    // 토큰 검증(await 실수를 했던 곳!!! - 트러블 슈팅 참고)
+    // const user = verifyToken(authorization);
+    const user = await verifyToken(authorization);
+
+    // 캐릭터 조회 (기본 정보 + 소유자 정보 포함)
     const character = await prisma.characters.findUnique({
       where: { characterId: +characterId },
+      select: {
+        characterName: true,
+        characterHp: true,
+        characterPower: true,
+        characterSpeed: true,
+        characterCoolDown: true,
+        characterMoney: true,
+      },
     });
+
     if (!character) {
       return res.status(404).json({ message: '존재하지 않는 캐릭터입니다.' });
     }
 
-    const data = {
+    // 기본 응답 데이터
+    let data = {
       characterName: character.characterName,
       characterHp: character.characterHp,
       characterPower: character.characterPower,
@@ -184,16 +215,18 @@ router.get('/charaters/:characterId', async (req, res, next) => {
       characterCoolDown: character.characterCoolDown,
     };
 
-    // authorization 헤더에 토큰이 없으면 게임 머니를 제외한 데이터를 반환
-    if (!authorization || !authorization.trim()) {
-      return res.status(200).json({ data });
+    // 본인의 캐릭터인 경우 추가 정보 포함
+    if (user && character.accountId === user.accountId) {
+      data = { ...data, characterMoney: character.characterMoney };
     }
 
-    // 유효한 토큰을 가진 사용자가 본인의 캐릭터를 조회한다면 게임 머니를 포함하여 데이터를 반환
-
-
-  } catch (error) {}
+    return res.status(200).json({ data });
+  } catch (err) {
+    next(err);
+  }
 });
+
+/** 계정별 캐릭터 목록 조회 */
 
 /** 캐릭터 삭제 API */
 

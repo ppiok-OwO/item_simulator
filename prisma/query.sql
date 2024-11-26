@@ -1,7 +1,7 @@
 -- SELECT * FROM `item_simulator`.`Accounts` LIMIT 1000;
 -- SELECT * FROM `item_simulator`.`Classes` LIMIT 1000;
 -- SELECT * FROM `item_simulator`.`Items` LIMIT 1000;
--- SELECT * FROM `item_simulator`.`Characters` LIMIT 1000;
+SELECT * FROM `item_simulator`.`Characters` LIMIT 1000;
 
 -- DESC Accounts;
 -- DESC Classes;
@@ -40,8 +40,8 @@
 -- DROP TABLE Classes, BasicItems, Items, Characters, CharacterInventory, CharacterItems;
 -- DROP TABLE Items;
 
-SELECT * FROM `item_simulator`.`Items` LIMIT 1000;
+-- SELECT * FROM `item_simulator`.`Items` LIMIT 1000;
 
-UPDATE Items
-SET itemStat = '{ "hp": 200, "power": 35, "cd": 20 }'
-WHERE itemCode = 8
+-- UPDATE Items
+-- SET itemStat = '{ "hp": 200, "power": 35, "cd": 20 }'
+-- WHERE itemCode = 8
