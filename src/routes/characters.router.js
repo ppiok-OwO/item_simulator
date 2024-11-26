@@ -46,38 +46,41 @@ router.post('/characters', authMiddleware, async (req, res, next) => {
     return res.status(400).json({ message: '존재하지 않는 클래스입니다.' });
   }
 
-  const { character, basicItem } = await prisma.$transaction(async (tx) => {
-    // 캐릭터 생성
-    const character = await tx.characters.create({
-      data: {
-        characterName,
-        characterHp: isExitClassId.classHp,
-        characterPower: isExitClassId.classPower,
-        characterSpeed: isExitClassId.classSpeed,
-        accountId: user.accountId,
-      },
-    });
+  const { character, basicItem } = await prisma.$transaction(
+    async (tx) => {
+      // 캐릭터 생성
+      const character = await tx.characters.create({
+        data: {
+          characterName,
+          characterHp: isExitClassId.classHp,
+          characterPower: isExitClassId.classPower,
+          characterSpeed: isExitClassId.classSpeed,
+          accountId: user.accountId,
+        },
+      });
 
-    // 기본 아이템 조회
-    const basicItem = await tx.basicItems.findFirst({
-      where: { classId: +classId },
-    });
-    if (!basicItem) {
-      return res
-        .status(400)
-        .json({ error: '기본 아이템이 존재하지 않습니다.' });
-    }
+      // 기본 아이템 조회
+      const basicItem = await tx.basicItems.findFirst({
+        where: { classId: +classId },
+      });
+      if (!basicItem) {
+        return res
+          .status(400)
+          .json({ error: '기본 아이템이 존재하지 않습니다.' });
+      }
 
-    // 기본 아이템 장착
-    await tx.characterItems.create({
-      data: {
-        characterId: character.characterId,
-        itemId: basicItem.itemId,
-      },
-    });
+      // 기본 아이템 장착
+      await tx.characterItems.create({
+        data: {
+          characterId: character.characterId,
+          itemId: basicItem.itemId,
+        },
+      });
 
-    return { character, basicItem };
-  });
+      return { character, basicItem };
+    },
+    { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted },
+  );
 
   // 아이템의 스탯만큼을 캐릭터에게 부여하기
   const item = await prisma.items.findFirst({

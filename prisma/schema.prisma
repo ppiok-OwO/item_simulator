@@ -15,7 +15,7 @@ datasource db {
 
 model Items{
   itemId Int @id @default(autoincrement()) @map("itemId")
-  itemCode Int @map("itemCode")
+  itemCode Int @map("itemCode") // 동일한 코드를 가진 동명의 아이템이 여러 개 생성될 수 있다.(다만 id는 각자 다를 것이다.)
   itemName String @map("itemName")
   itemStat Json @map("itemStat")
   itemPrice Int @map("itemPrice")
@@ -64,6 +64,7 @@ model Characters{
   characterHp Int @map("characterHp")
   characterPower Int @map("characterPower")
   characterSpeed Int @map("characterSpeed")
+  characterCoolDown Int @map("characterCoolDown")
   characterMoney Int @default( 10000) @map("characterMoney")
   accountId Int @map("accountId")
   classId Int? @map("classId") // 캐릭터 생성 시 필수 입력값이지만 특정 클래스가 없어질 가능성이 존재
@@ -85,6 +86,7 @@ model Classes{
   classHp Int @map("classHp")
   classPower Int @map("classPower")
   classSpeed Int @map("classSpeed")
+  classCoolDown Int @map("classCoolDown")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime? @updatedAt @map("updatedAt")
 

@@ -1,0 +1,58 @@
+{
+  "item1": {
+    "itemCode": 1,
+    "itemName": "강철심장",
+    "itemStat": { "hp": 900, "power": 12, "cd": 0 },
+    "itemPrice": 3000,
+    "classId": 1
+  },
+  "item2": {
+    "itemCode": 2,
+    "itemName": "밤의 끝자락",
+    "itemStat": { "hp": 250, "power": 65, "cd": 0 },
+    "itemPrice": 3000,
+    "classId": 2
+  },
+  "item3": {
+    "itemCode": 3,
+    "itemName": "라바돈의 죽음 모자",
+    "itemStat": { "hp": 0, "power": 120, "cd": 0 },
+    "itemPrice": 3600,
+    "classId": 3
+  },
+  "item4": {
+    "itemCode": 4,
+    "itemName": "불타는 향로",
+    "itemStat": { "hp": 100, "power": 45, "cd": 0 },
+    "itemPrice": 2200,
+    "classId": 4
+  },
+  "item5": {
+    "itemCode": 5,
+    "itemName": "칠흑의 양날 도끼",
+    "itemStat": { "hp": 400, "power": 40, "cd": 20 },
+    "itemPrice": 3000,
+    "classId": 1
+  },
+  "item6": {
+    "itemCode": 6,
+    "itemName": "월식",
+    "itemStat": { "hp": 0, "power": 40, "cd": 15 },
+    "itemPrice": 2900,
+    "classId": 2
+  },
+  "item7": {
+    "itemCode": 7,
+    "itemName": "지평선의 초점",
+    "itemStat": { "hp": 0, "power": 75, "cd": 25 },
+    "itemPrice": 2700,
+    "classId": 3
+  },
+  "item8": {
+    "itemCode": 8,
+    "itemName": "헬리아의 메아리",
+    "itemStat": { "hp": 200, "power": 35, "cd": 20 },
+    "itemPrice": 2200,
+    "classId": 4
+  }
+}

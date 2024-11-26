@@ -1,0 +1,30 @@
+{
+  "class1": {
+    "className": "전사",
+    "classHp": 1000,
+    "classPower": 100,
+    "classSpeed": 10,
+    "classCoolDown": 5
+  },
+  "class2": {
+    "className": "도적",
+    "classHp": 700,
+    "classPower": 110,
+    "classSpeed": 12,
+    "classCoolDown": 10
+  },
+  "class3": {
+    "className": "마법사",
+    "classHp": 800,
+    "classPower": 120,
+    "classSpeed": 8,
+    "classCoolDown": 15
+  },
+  "class4": {
+    "className": "사제",
+    "classHp": 900,
+    "classPower": 90,
+    "classSpeed": 9,
+    "classCoolDown": 9
+  }
+}

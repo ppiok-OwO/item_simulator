@@ -1,4 +1,5 @@
 import express from 'express';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../utils/prisma/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -140,26 +141,5 @@ router.post('/sign-in', async (req, res, next) => {
     next(err);
   }
 });
-
-// Access Token을 생성하는 함수
-// function createAccessToken(userId) {
-//   const accessToken = jwt.sign(
-//     { userId: userId }, // JWT 데이터
-//     process.env.ACCESS_TOKEN_SECRET_KEY, // Access Token의 비밀 키
-//     { expiresIn: '10s' }, // Access Token이 10초 뒤에 만료되도록 설정합니다.
-//   );
-
-//   return accessToken;
-// }
-// // Refresh Token을 생성하는 함수
-// function createRefreshToken(userId) {
-//   const refreshToken = jwt.sign(
-//     { userId: userId }, // JWT 데이터
-//     process.env.REFRESH_TOKEN_SECRET_KEY, // Refresh Token의 비밀 키
-//     { expiresIn: '7d' }, // Refresh Token이 7일 뒤에 만료되도록 설정합니다.
-//   );
-
-//   return refreshToken;
-// }
 
 export default router;
