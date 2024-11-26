@@ -10,12 +10,6 @@ dotenv.config();
 const router = express.Router();
 
 /** 회원가입 API */
-// 아이디, 비밀번호, 비밀번호 확인, 이름을 데이터로 넘겨서 회원가입을 요청합니다.
-// - 보안을 위해 비밀번호는 평문(Plain Text)으로 저장하지 않고 해싱된 값을 저장합니다.
-// - 아래 사항에 대한 **유효성 체크**를 해야 되며 유효하지 않은 경우 알맞은 HTTP 상태코드와 에러 메세지를 반환해야 합니다.
-// - **아이디**: 다른 사용자와 중복될 수 없으며 오로지 **영어 소문자 + 숫자 조합**으로 구성이 되어야 합니다.
-// - **비밀번호:** 최소 6자 이상이며, 비밀번호 확인과 일치해야 합니다.
-// - 회원가입 성공 시, 비밀번호를 제외 한 사용자의 정보를 반환합니다.
 router.post('/sign-up', async (req, res, next) => {
   const { userId, password, passwordCheck, userName } = req.body;
 
@@ -94,12 +88,6 @@ router.post('/sign-up', async (req, res, next) => {
 });
 
 /** 로그인 API */
-// 아이디, 비밀번호로 로그인을 요청합니다.
-// - 계정 정보가 일치하지 않을 경우 알맞은 HTTP 상태코드와 에러 메세지를 반환해야 합니다.
-// - 아이디가 존재하지 않는 경우
-// - 아이디는 존재하는데 비밀번호가 틀리는 경우
-// **로그인 성공 시, 엑세스 토큰을 생성하여 반환합니다.**
-// - 이 때, 엑세스 토큰의 Payload는 로그인 한 계정의 ID를 담고 있어야겠죠?
 router.post('/sign-in', async (req, res, next) => {
   const { userId, password } = req.body;
 

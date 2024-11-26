@@ -228,11 +228,46 @@ router.delete(
   '/characters/:characterId',
   authMiddleware,
   async (req, res, next) => {
-    const { characterId } = req.params;
-    const { userId } = req.locals;
-    const user = await prisma.accounts.findUnique({
-      where: { userId },
-    });
+    try {
+      const { characterId } = req.params;
+      const { userId } = req.locals;
+
+      // 계정 존재 여부 다시 확인(authMiddleware에서 이미 확인하지만 혹시 모르니까...)
+      const user = await prisma.accounts.findUnique({
+        where: { userId },
+      });
+      if (!user) {
+        return res.status(401).json({ message: '계정이 존재하지 않습니다.' });
+      }
+
+      // 캐릭터 존재 여부 확인
+      const character = await prisma.characters.findUnique({
+        where: { characterId: +characterId },
+      });
+      if (!character) {
+        return res.status(404).json({ message: '존재하지 않는 캐릭터입니다.' });
+      }
+
+      // 계정 일치 여부
+      if (character.accountId !== user.accountId) {
+        return res.status(403).json({
+          message: '다른 계정이 소유한 캐릭터는 삭제할 수 없습니다.',
+        });
+      }
+
+      // 캐릭터 삭제
+      await prisma.characters.delete({
+        where: {
+          characterId: character.characterId,
+        },
+      });
+
+      return res.status(200).json({
+        message: '삭제가 완료되었습니다.',
+      });
+    } catch (err) {
+      next(err);
+    }
   },
 );
 

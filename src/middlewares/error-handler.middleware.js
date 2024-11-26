@@ -6,12 +6,12 @@ export default (err, req, res, next) => {
     case 'TokenExpiredError':
       return res
         .status(401)
-        .json({ message: '토큰이 만료되었습니다. 재로그인이 필요합니다.' });
+        .json({ errorMessage: '토큰이 만료되었습니다. 재로그인이 필요합니다.' });
     case 'JsonWebTokenError':
-      return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
+      return res.status(401).json({ errorMessage: '유효하지 않은 토큰입니다.' });
     default:
       return res
         .status(401)
-        .json({ message: err.message || '비정상적인 요청입니다.' });
+        .json({ errorMessage: '비정상적인 요청입니다.' });
   }
 };
