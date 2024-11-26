@@ -14,7 +14,10 @@ const router = express.Router();
 /** 캐릭터 생성 API */
 router.post('/characters', authMiddleware, async (req, res, next) => {
   const { characterName, classId } = req.body;
-  const { user } = req.locals;
+  const { userId } = req.locals;
+  const user = await prisma.accounts.findUnique({
+    where: { userId },
+  });
 
   try {
     // 필수 입력값을 모두 받았는지 확인
@@ -192,14 +195,6 @@ router.get('/characters/:characterId', async (req, res, next) => {
     // 캐릭터 조회 (기본 정보 + 소유자 정보 포함)
     const character = await prisma.characters.findUnique({
       where: { characterId: +characterId },
-      select: {
-        characterName: true,
-        characterHp: true,
-        characterPower: true,
-        characterSpeed: true,
-        characterCoolDown: true,
-        characterMoney: true,
-      },
     });
 
     if (!character) {
@@ -229,6 +224,17 @@ router.get('/characters/:characterId', async (req, res, next) => {
 /** 계정별 캐릭터 목록 조회 */
 
 /** 캐릭터 삭제 API */
+router.delete(
+  '/characters/:characterId',
+  authMiddleware,
+  async (req, res, next) => {
+    const { characterId } = req.params;
+    const { userId } = req.locals;
+    const user = await prisma.accounts.findUnique({
+      where: { userId },
+    });
+  },
+);
 
 /** 캐릭터가 장착한 아이템 조회 */
 

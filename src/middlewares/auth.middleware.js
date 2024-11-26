@@ -19,11 +19,9 @@ export default async function (req, res, next) {
     // 2. Bearer 토큰 형식인지 확인
     const [tokenType, token] = authorization.split(' ');
     if (tokenType !== 'Bearer' || !token) {
-      return res
-        .status(400)
-        .json({
-          message: '토큰 타입이 Bearer 형식이 아니거나 누락되었습니다.',
-        });
+      return res.status(400).json({
+        message: '토큰 타입이 Bearer 형식이 아니거나 누락되었습니다.',
+      });
     }
 
     // 3. JWT 검증
@@ -57,7 +55,7 @@ export default async function (req, res, next) {
 
     // 5. 인증 성공 시 사용자 정보 저장
     req.locals = req.locals || {};
-    req.locals.user = user;
+    // req.locals.user = user;
     req.locals.userId = userId;
 
     // 6. 다음 미들웨어 실행
