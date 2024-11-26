@@ -84,7 +84,7 @@ router.post('/sign-up', async (req, res, next) => {
       },
     });
 
-    return res.status(201).json({ data: { userId, userName } });
+    return res.status(201).json({ message: "계정이 성공적으로 생성되었습니다.", data: { userId, userName } });
   } catch (err) {
     next(err);
   }

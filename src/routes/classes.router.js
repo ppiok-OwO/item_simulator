@@ -43,7 +43,12 @@ router.post('/classes', authMiddleware, async (req, res, next) => {
       },
     });
 
-    return res.status(201).json({ data: characterClass });
+    return res
+      .status(201)
+      .json({
+        message: '클래스가 성공적으로 생성되었습니다.',
+        data: characterClass,
+      });
   } catch (err) {
     next(err);
   }

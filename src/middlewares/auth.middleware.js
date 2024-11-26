@@ -53,7 +53,8 @@ export default async function (req, res, next) {
 
     // 5. 인증 성공 시 사용자 정보 저장
     req.locals = req.locals || {};
-    req.locals.userId = decodedToken;
+    req.locals.user = user;
+    req.locals.userId = userId;
 
     // 6. 다음 미들웨어 실행
     next();
