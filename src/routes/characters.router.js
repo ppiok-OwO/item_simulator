@@ -161,8 +161,44 @@ export async function equipItem(character, item) {
   });
 }
 
+/** 계정별 캐릭터 목록 조회 */
+
 /** 캐릭터 상세 조회 API */
+router.get('/charaters/:characterId', async (req, res, next) => {
+  const { characterId } = req.params;
+  const authorization = req.headers.authorization;
+
+  try {
+    const character = await prisma.characters.findUnique({
+      where: { characterId: +characterId },
+    });
+    if (!character) {
+      return res.status(404).json({ message: '존재하지 않는 캐릭터입니다.' });
+    }
+
+    const data = {
+      characterName: character.characterName,
+      characterHp: character.characterHp,
+      characterPower: character.characterPower,
+      characterSpeed: character.characterSpeed,
+      characterCoolDown: character.characterCoolDown,
+    };
+
+    // authorization 헤더에 토큰이 없으면 게임 머니를 제외한 데이터를 반환
+    if (!authorization || !authorization.trim()) {
+      return res.status(200).json({ data });
+    }
+
+    // 유효한 토큰을 가진 사용자가 본인의 캐릭터를 조회한다면 게임 머니를 포함하여 데이터를 반환
+
+
+  } catch (error) {}
+});
 
 /** 캐릭터 삭제 API */
+
+/** 캐릭터가 장착한 아이템 조회 */
+
+/** 캐릭터 인벤토리 조회 */
 
 export default router;

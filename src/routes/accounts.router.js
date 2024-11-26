@@ -84,7 +84,10 @@ router.post('/sign-up', async (req, res, next) => {
       },
     });
 
-    return res.status(201).json({ message: "계정이 성공적으로 생성되었습니다.", data: { userId, userName } });
+    return res.status(201).json({
+      message: '계정이 성공적으로 생성되었습니다.',
+      data: { userId, userName },
+    });
   } catch (err) {
     next(err);
   }
@@ -131,8 +134,8 @@ router.post('/sign-in', async (req, res, next) => {
       },
     );
 
-    // accessToken쿠키에 Bearer 토큰을 담아서 유저에게 응답합니다.
-    res.cookie('accessToken', `Bearer ${accessToken}`);
+    // authorization헤더에 Bearer 토큰을 담아서 유저에게 응답합니다.
+    res.setHeader('authorization', `Bearer ${accessToken}`);
 
     return res
       .status(200)

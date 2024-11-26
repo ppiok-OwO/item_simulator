@@ -33,6 +33,7 @@ router.post('/classes', authMiddleware, async (req, res, next) => {
       return res.status(400).json({ message: '권한을 가지고 있지 않습니다.' });
     }
 
+    // 클래스 생성
     const characterClass = await prisma.classes.create({
       data: {
         className,
