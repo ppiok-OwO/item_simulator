@@ -63,6 +63,7 @@ router.patch(
                 itemStat: item.itemStat,
                 itemPrice: item.itemPrice,
                 classId: item.classId,
+                characterId: character.characterId,
               },
             });
 
@@ -137,9 +138,6 @@ router.delete(
       }
 
       // 아이템 유효성 검사
-      const sellItems = await prisma.items.findFirst({
-        where: { itemCode: +itemCode, },
-      });
       const sellItems = await prisma.characterInventory.findMany({
         where: { itemCode: +itemCode },
         take: count,

@@ -103,6 +103,7 @@ router.post('/characters', authMiddleware, async (req, res, next) => {
             itemStat,
             itemPrice,
             classId,
+            characterId: character.characterId,
           },
         });
 
