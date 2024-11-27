@@ -1,7 +1,7 @@
 -- SELECT * FROM `item_simulator`.`Accounts` LIMIT 1000;
 -- SELECT * FROM `item_simulator`.`Classes` LIMIT 1000;
--- SELECT * FROM `item_simulator`.`Items` LIMIT 1000;
-SELECT * FROM `item_simulator`.`Characters` LIMIT 1000;
+SELECT * FROM `item_simulator`.`Items` LIMIT 1000;
+-- SELECT * FROM `item_simulator`.`Characters` LIMIT 1000;
 
 -- DESC Accounts;
 -- DESC Classes;

@@ -18,7 +18,7 @@ router.post('/sign-up', async (req, res, next) => {
     if (!userId || !password || !passwordCheck || !userName) {
       return res
         .status(400)
-        .json({ error: '사용자 정보를 모두 입력해 주세요.' });
+        .json({ message: '사용자 정보를 모두 입력해 주세요.' });
     }
 
     // ID 유효성 검사
@@ -26,7 +26,7 @@ router.post('/sign-up', async (req, res, next) => {
     if (!isValidUserId) {
       return res.status(400).json({
         error:
-          '사용자 ID는 공백 없이 영어 소문자와 숫자의 조합으로만 구성되어야 합니다.',
+          '사용자ID는 공백 없이 영어 소문자와 숫자의 조합으로만 구성되어야 합니다.',
       });
     }
     // 중복되는 사용자 ID가 존재하는지 검사
@@ -42,23 +42,23 @@ router.post('/sign-up', async (req, res, next) => {
     const isValidPassword = /^[a-z0-9]+$/.test(password);
     if (!isValidPassword) {
       return res.status(400).json({
-        error:
+        message:
           '사용자 비밀번호는 공백 없이 영어 소문자와 숫자의 조합으로만 구성되어야 합니다.',
       });
     }
     if (password.length < 6) {
       return res.status(400).json({
-        error: '사용자 비밀번호는 최소 6자리 이상이어야 합니다.',
+        message: '사용자 비밀번호는 최소 6자리 이상이어야 합니다.',
       });
     }
     if (password !== passwordCheck) {
       return res.status(400).json({
-        error: '비밀번호 확인이 일치하지 않습니다.',
+        message: '비밀번호 확인이 일치하지 않습니다.',
       });
     }
 
     // 사용자 이름 유효성 검사
-    // 한국어여야 하고 비어있으면 안 된다.
+    // 한글이어야 하고 비어있으면 안 된다.
     const isValidUserName = /^[가-힣]+$/;
     if (!isValidUserName) {
       return res.status(400).json({
@@ -87,6 +87,7 @@ router.post('/sign-up', async (req, res, next) => {
   }
 });
 
+/**===================================================================*/
 /** 로그인 API */
 router.post('/sign-in', async (req, res, next) => {
   const { userId, password } = req.body;
@@ -98,16 +99,38 @@ router.post('/sign-in', async (req, res, next) => {
         .status(400)
         .json({ error: '로그인 정보를 모두 입력해 주세요.' });
     }
+    // ID 유효성 검사
+    const isValidUserId = /^[a-z0-9]+$/.test(userId);
+    if (!isValidUserId) {
+      return res.status(400).json({
+        error:
+          '사용자ID는 공백 없이 영어 소문자와 숫자의 조합으로만 구성되어야 합니다.',
+      });
+    }
+    // password 유효성 검사 + 비밀번호 확인이 일치하는지 검사
+    // 비밀번호는 길이 빼고는 따로 기준이 없어서 ID와 같은 방식으로 유효성 검사를 해주었다.
+    const isValidPassword = /^[a-z0-9]+$/.test(password);
+    if (!isValidPassword) {
+      return res.status(400).json({
+        message:
+          '사용자 비밀번호는 공백 없이 영어 소문자와 숫자의 조합으로만 구성되어야 합니다.',
+      });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: '사용자 비밀번호는 최소 6자리 이상이어야 합니다.',
+      });
+    }
 
-    // 일치하는 ID와 비밀번호가 존재하는지 검사
-    // 아이디가 존재하지 않는 경우
-    // 비밀번호가 틀린 경우
+    // DB에 해당 ID와 비밀번호가 존재하는지 검사
     const user = await prisma.accounts.findFirst({
       where: { userId },
     });
+    // DB에 ID가 존재하지 않는 경우
     if (!user) {
       res.status(401).json({ message: '존재하지 않는 ID입니다.' });
     }
+    // 비밀번호가 틀린 경우
     if (!(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: '잘못된 비밀번호입니다.' });
     }

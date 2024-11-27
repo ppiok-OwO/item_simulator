@@ -9,11 +9,11 @@ export default async function (req, res, next) {
   try {
     // 1. Authorization 헤더를 가져옴
     const authorization = req.headers.authorization;
-    if (!authorization || !authorization.trim()) {
+    if (!authorization || authorization.trim().length === 0) {
       // authorization헤더가 비어있거나 빈칸만 존재할 경우
       return res
         .status(401)
-        .json({ message: 'Authorization 헤더가 없습니다.' });
+        .json({ message: '토큰이 존재하지 않습니다.' });
     }
 
     // 2. Bearer 토큰 형식인지 확인

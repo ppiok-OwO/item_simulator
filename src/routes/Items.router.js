@@ -13,11 +13,36 @@ const router = express.Router();
 router.post('/items', authMiddleware, async (req, res, next) => {
   // 아이템 코드, 이름, 스탯, 가격을 request로 전달받기
   const { itemCode, itemName, itemStat, itemPrice, classId } = req.body;
+  // 운영자만이 새로운 아이템을 추가할 수 있다.
+  const { adminId, adminPassword } = req.body;
 
   try {
     // 데이터 유효성 검사
     if (!itemCode || !itemName || !itemStat | !itemPrice || !classId) {
       return res.status(400).json({ message: '모든 필드를 입력해 주세요.' });
+    }
+
+    // 운영자ID와 비밀번호를 입력하지 않았을 때, DB에 존재하는 아이템만 추가가 가능하다.
+    if (
+      !(
+        adminId === process.env.ADMIN_ID &&
+        adminPassword === process.env.ADMIN_PASSWORD
+      )
+    ) {
+      const isValidItem = await prisma.items.findFirst({
+        where: {
+          itemCode: +itemCode,
+          itemName,
+          itemStat,
+          itemPrice: +itemPrice,
+          classId: +classId,
+        },
+      });
+      if (!isValidItem) {
+        return res
+          .status(400)
+          .json({ message: '생성할 수 없는 아이템입니다.' });
+      }
     }
 
     // 아이템 레코드 생성

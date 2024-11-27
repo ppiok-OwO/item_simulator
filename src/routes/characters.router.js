@@ -21,7 +21,7 @@ router.post('/characters', authMiddleware, async (req, res, next) => {
 
   try {
     // 필수 입력값을 모두 받았는지 확인
-    if (!characterName || !classId || !characterName.trim()) {
+    if (!characterName || !classId || !characterName.trim().length === 0) {
       return res
         .status(400)
         .json({ error: '캐릭터 정보를 모두 입력해 주세요.' });
@@ -31,6 +31,11 @@ router.post('/characters', authMiddleware, async (req, res, next) => {
     if (characterName.length > 15) {
       return res.status(400).json({
         error: '캐릭터 이름은 15글자를 넘을 수 없습니다.',
+      });
+    }
+    if (typeof characterName !== 'string') {
+      return res.status(400).json({
+        error: '캐릭터 이름은 문자열 형태여야 합니다.',
       });
     }
 
@@ -80,12 +85,12 @@ router.post('/characters', authMiddleware, async (req, res, next) => {
           where: { classId: classIdNumber },
         });
         if (!basicItem) {
-          return res
-            .status(400)
-            .json({ error: '기본 아이템이 존재하지 않습니다.' });
+          return res.status(400).json({
+            error: '선택한 클래스의 기본 아이템이 존재하지 않습니다.',
+          });
         }
 
-        // 조회한 기본 아이템의 id를 바탕으로, 해당 아이템이 가진 밸류들을 가져온다.
+        // 조회한 기본 아이템의 id를 바탕으로, 해당 아이템의 데이터를 가져온다.
         const { itemCode, itemName, itemStat, itemPrice, classId } =
           await tx.items.findFirst({
             where: { itemId: basicItem.itemId },
@@ -138,9 +143,10 @@ router.post('/characters', authMiddleware, async (req, res, next) => {
   }
 });
 
+/**=========================================== */
 /** 아이템 장착하기 함수 */
 export async function equipItem(character, item) {
-  // 업데이트된 DB를 반영한 캐릭터를 불러온다.
+  // 업데이트된 DB를 반영하여 캐릭터를 불러온다.
   const updatedCharacter = await prisma.characters.findUnique({
     where: { characterId: character.characterId },
   });
@@ -164,39 +170,17 @@ export async function equipItem(character, item) {
   });
 }
 
-/** 토큰 검증 함수 */
-async function verifyToken(authorization) {
-  if (!authorization || !authorization.trim()) return null;
-
-  const [tokenType, token] = authorization.split(' ');
-  if (tokenType !== 'Bearer' || !token) return null;
-
-  try {
-    const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET_KEY);
-    const user = await prisma.accounts.findFirst({
-      where: { userId: decodedToken.userId },
-    });
-    return user || null;
-  } catch (error) {
-    return null; // 유효하지 않은 토큰 처리
-  }
-}
-
+/**========================================== */
 /** 캐릭터 상세 조회 API */
 router.get('/characters/:characterId', async (req, res, next) => {
   try {
     const { characterId } = req.params;
     const authorization = req.headers.authorization;
 
-    // 토큰 검증(await 실수를 했던 곳!!! - 트러블 슈팅 참고)
-    // const user = verifyToken(authorization);
-    const user = await verifyToken(authorization);
-
     // 캐릭터 조회 (기본 정보 + 소유자 정보 포함)
     const character = await prisma.characters.findUnique({
       where: { characterId: +characterId },
     });
-
     if (!character) {
       return res.status(404).json({ message: '존재하지 않는 캐릭터입니다.' });
     }
@@ -210,6 +194,10 @@ router.get('/characters/:characterId', async (req, res, next) => {
       characterCoolDown: character.characterCoolDown,
     };
 
+    // 토큰 검증(await 실수를 했던 곳!!! - 트러블 슈팅 참고)
+    // const user = verifyToken(authorization);
+    const user = await verifyToken(authorization);
+
     // 본인의 캐릭터인 경우 추가 정보 포함
     if (user && character.accountId === user.accountId) {
       data = { ...data, characterMoney: character.characterMoney };
@@ -221,8 +209,60 @@ router.get('/characters/:characterId', async (req, res, next) => {
   }
 });
 
-/** 계정별 캐릭터 목록 조회 */
+/**====================================== */
+/** 토큰 검증 함수 */
+async function verifyToken(authorization) {
+  // 토큰이 없으면 null 반환
+  if (!authorization || authorization.trim().length===0) return null;
 
+  // 잘못된 형식의 토큰이면 null 반환
+  const [tokenType, token] = authorization.split(' ');
+  if (tokenType !== 'Bearer' || !token) return null;
+
+  try {
+    // 토큰이 검증을 통과 했을 때 사용자 계정 데이터를 반환
+    const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET_KEY);
+    const user = await prisma.accounts.findUnique({
+      where: { userId: decodedToken.userId },
+    });
+    return user || null;
+  } catch (error) {
+    return null; // 그 밖의 경우 모두 null 반환
+  }
+}
+
+/**======================================== */
+/** 계정별 캐릭터 목록 조회 */
+// 계정에 속해있는 캐릭터의 이름과 클래스만 조회할 수 있다.
+router.get('/characters/accounts/:accountId', async (req, res, next) => {
+  try {
+    const { accountId } = req.params;
+    const account = await prisma.accounts.findUnique({
+      where: { accountId: +accountId },
+    });
+    if (!account) {
+      return res.status(404).json({ message: '존재하지 않는 계정ID입니다.' });
+    }
+
+    const characterList = await prisma.characters.findMany({
+      where: { accountId: +accountId },
+      select: {
+        characterName: true,
+        class: {
+          select: {
+            className: true,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json({ characterList });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**========================================= */
 /** 캐릭터 삭제 API */
 router.delete(
   '/characters/:characterId',
@@ -232,12 +272,12 @@ router.delete(
       const { characterId } = req.params;
       const { userId } = req.locals;
 
-      // 계정 존재 여부 다시 확인(authMiddleware에서 이미 확인하지만 혹시 모르니까...)
+      // 계정 존재 여부 다시 확인(authMiddleware에서 authorization 헤더를 통해 토큰을 검증하긴 하지만 혹시 모르니까...!)
       const user = await prisma.accounts.findUnique({
         where: { userId },
       });
       if (!user) {
-        return res.status(401).json({ message: '계정이 존재하지 않습니다.' });
+        return res.status(401).json({ message: '로그인 계정이 존재하지 않습니다.' });
       }
 
       // 캐릭터 존재 여부 확인
