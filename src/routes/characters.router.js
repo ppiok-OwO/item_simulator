@@ -213,7 +213,7 @@ router.get('/characters/:characterId', async (req, res, next) => {
 /** 토큰 검증 함수 */
 async function verifyToken(authorization) {
   // 토큰이 없으면 null 반환
-  if (!authorization || authorization.trim().length===0) return null;
+  if (!authorization || authorization.trim().length === 0) return null;
 
   // 잘못된 형식의 토큰이면 null 반환
   const [tokenType, token] = authorization.split(' ');
@@ -231,37 +231,6 @@ async function verifyToken(authorization) {
   }
 }
 
-/**======================================== */
-/** 계정별 캐릭터 목록 조회 */
-// 계정에 속해있는 캐릭터의 이름과 클래스만 조회할 수 있다.
-router.get('/characters/accounts/:accountId', async (req, res, next) => {
-  try {
-    const { accountId } = req.params;
-    const account = await prisma.accounts.findUnique({
-      where: { accountId: +accountId },
-    });
-    if (!account) {
-      return res.status(404).json({ message: '존재하지 않는 계정ID입니다.' });
-    }
-
-    const characterList = await prisma.characters.findMany({
-      where: { accountId: +accountId },
-      select: {
-        characterName: true,
-        class: {
-          select: {
-            className: true,
-          },
-        },
-      },
-    });
-
-    return res.status(200).json({ characterList });
-  } catch (err) {
-    next(err);
-  }
-});
-
 /**========================================= */
 /** 캐릭터 삭제 API */
 router.delete(
@@ -277,7 +246,9 @@ router.delete(
         where: { userId },
       });
       if (!user) {
-        return res.status(401).json({ message: '로그인 계정이 존재하지 않습니다.' });
+        return res
+          .status(401)
+          .json({ message: '로그인 계정이 존재하지 않습니다.' });
       }
 
       // 캐릭터 존재 여부 확인
@@ -311,8 +282,79 @@ router.delete(
   },
 );
 
-/** 캐릭터가 장착한 아이템 조회 */
+/**========================================= */
+/** 캐릭터가 장착한 아이템 조회 API */
+router.get('/charactersItem/:characterId', async (req, res, next) => {
+  const { characterId } = req.params;
 
+  try {
+    const characterItem = await prisma.characterItems.findMany({
+      where: { characterId: +characterId },
+      select: {
+        item: {
+          select: {
+            itemCode: true,
+            itemName: true,
+            itemStat: true,
+            itemPrice: true,
+            class: {
+              select: {
+                className: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!characterItem) {
+      return res.status(404).json({ message: '존재하지 않는 캐릭터입니다.' });
+    }
+
+    return res.status(200).json({
+      characterItem,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**========================================= */
 /** 캐릭터 인벤토리 조회 */
+router.get('/charactersInventory/:characterId', async (req, res, next) => {
+  const { characterId } = req.params;
+
+  try {
+    const characterItem = await prisma.characterInventory.findMany({
+      where: { characterId: +characterId },
+      select: {
+        item: {
+          select: {
+            itemCode: true,
+            itemName: true,
+            itemStat: true,
+            itemPrice: true,
+            class: {
+              select: {
+                className: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!characterItem) {
+      return res.status(404).json({ message: '존재하지 않는 캐릭터입니다.' });
+    }
+
+    return res.status(200).json({
+      characterItem,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**========================================= */
+/** 아이템 장착 API */
 
 export default router;

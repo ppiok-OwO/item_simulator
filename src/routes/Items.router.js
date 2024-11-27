@@ -97,6 +97,7 @@ router.post('/basicitems', authMiddleware, async (req, res, next) => {
   }
 });
 
+//===============================/
 /** 아이템 목록 조회 API */
 router.get('/items', async (req, res, next) => {
   try {
@@ -145,6 +146,7 @@ router.get('/items/:itemCode', async (req, res, next) => {
   }
 });
 
+//==========================/
 /** 아이템 수정 API */
 router.patch('/items/:itemCode', authMiddleware, async (req, res, next) => {
   const { itemCode } = req.params;

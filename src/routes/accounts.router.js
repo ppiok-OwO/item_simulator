@@ -156,4 +156,35 @@ router.post('/sign-in', async (req, res, next) => {
   }
 });
 
+/**======================================== */
+/** 계정별 캐릭터 목록 조회 */
+// 계정에 속해있는 캐릭터의 이름과 클래스만 조회할 수 있다.
+router.get('/accounts/characters/:accountId', async (req, res, next) => {
+  try {
+    const { accountId } = req.params;
+    const account = await prisma.accounts.findUnique({
+      where: { accountId: +accountId },
+    });
+    if (!account) {
+      return res.status(404).json({ message: '존재하지 않는 계정ID입니다.' });
+    }
+
+    const characterList = await prisma.characters.findMany({
+      where: { accountId: +accountId },
+      select: {
+        characterName: true,
+        class: {
+          select: {
+            className: true,
+          },
+        },
+      },
+    });
+
+    return res.status(200).json({ characterList });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

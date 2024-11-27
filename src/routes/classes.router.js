@@ -16,7 +16,7 @@ router.post('/classes', authMiddleware, async (req, res, next) => {
   const { className, classHp, classPower, classSpeed, classCoolDown } =
     req.body;
   // 운영자만이 클래스를 추가할 수 있다.
-  const { adminId, adminPassword } = req.body;
+  const { userId } = req.locals;
 
   try {
     // 데이터 유효성 검사
@@ -44,12 +44,10 @@ router.post('/classes', authMiddleware, async (req, res, next) => {
       },
     });
 
-    return res
-      .status(201)
-      .json({
-        message: '클래스가 성공적으로 생성되었습니다.',
-        data: characterClass,
-      });
+    return res.status(201).json({
+      message: '클래스가 성공적으로 생성되었습니다.',
+      data: characterClass,
+    });
   } catch (err) {
     next(err);
   }
