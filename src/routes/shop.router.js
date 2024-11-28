@@ -206,4 +206,36 @@ router.delete(
   },
 );
 
+/** 골드 획득 API */
+// 캐릭터의 ID를 URI의 parameter로 받으면 100원씩 벌 수 있게
+router.patch('/gold/:characterId', authMiddleware, async (req, res, next) => {
+  const { characterId } = req.params;
+  const { userId } = req.locals;
+
+  try {
+    const user = await prisma.accounts.findUnique({
+      where: { userId },
+    });
+    const character = await prisma.characters.findUnique({
+      where: { characterId: +characterId },
+    });
+    if (character.accountId !== user.accountId) {
+      return res.status(403).json({ message: '잘못된 계정에 접근하였습니다.' });
+    }
+
+    const updatedCharacter = await prisma.characters.update({
+      where: { characterId: +characterId },
+      data: {
+        characterMoney: character.characterMoney + 100,
+      },
+    });
+
+    return res
+      .status(200)
+      .json({ characterMoney: updatedCharacter.characterMoney });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

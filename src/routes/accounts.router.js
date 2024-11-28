@@ -17,7 +17,10 @@ router.post('/sign-up', async (req, res, next) => {
     if (!userId || !password || !passwordCheck || !userName) {
       return res
         .status(400)
-        .json({ message: '사용자ID, 비밀번호, 비밀번호 확인, 사용자 이름을 입력해 주세요.' });
+        .json({
+          message:
+            '사용자ID, 비밀번호, 비밀번호 확인, 사용자 이름을 입력해 주세요.',
+        });
     }
 
     // ID 유효성 검사
@@ -180,7 +183,7 @@ router.get('/accounts/characters/:accountId', async (req, res, next) => {
       },
     });
 
-    return res.status(200).json({ characterList });
+    return res.status(200).json(characterList);
   } catch (err) {
     next(err);
   }

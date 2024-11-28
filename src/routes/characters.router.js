@@ -326,9 +326,7 @@ router.get('/charactersItem/:characterId', async (req, res, next) => {
       return res.status(404).json({ message: '존재하지 않는 캐릭터입니다.' });
     }
 
-    return res.status(200).json({
-      characterItem,
-    });
+    return res.status(200).json(characterItem);
   } catch (err) {
     next(err);
   }
@@ -388,9 +386,7 @@ router.get(
           .json({ message: '인벤토리가 존재하지 않는 캐릭터입니다.' });
       }
 
-      return res.status(200).json({
-        characterInventoryItem,
-      });
+      return res.status(200).json(characterInventoryItem);
     } catch (err) {
       next(err);
     }
