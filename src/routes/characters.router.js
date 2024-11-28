@@ -100,7 +100,7 @@ router.post('/characters', authMiddleware, async (req, res, next) => {
         // 조회한 기본 아이템의 id를 바탕으로, 해당 아이템의 데이터를 가져온다.
         const { itemCode, itemName, itemStat, itemPrice, classId } =
           await tx.items.findFirst({
-            where: { itemId: basicItem.itemId },
+            where: { itemCode: basicItem.itemCode },
           });
         // 아이템 테이블에 새 캐릭터가 장착할 기본 아이템 생성
         const item = await tx.items.create({

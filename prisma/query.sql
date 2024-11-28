@@ -3,7 +3,7 @@
 -- SELECT * FROM `item_simulator`.`Items` LIMIT 1000;
 -- SELECT * FROM `item_simulator`.`Characters` LIMIT 1000;
 -- SELECT * FROM `item_simulator`.`CharacterItems` LIMIT 1000;
-SELECT * FROM `item_simulator`.`CharacterInventory` LIMIT 1000;
+-- SELECT * FROM `item_simulator`.`CharacterInventory` LIMIT 1000;
 
 -- DESC Accounts;
 -- DESC Classes;
@@ -18,10 +18,10 @@ SELECT * FROM `item_simulator`.`CharacterInventory` LIMIT 1000;
 -- SET characterMoney = 10000000
 -- WHERE accountId = 5
 
--- ALTER TABLE item_simulator.CharacterInventory
--- ADD COLUMN itemName VARCHAR(255);
+-- ALTER TABLE item_simulator.BasicItems
+-- ADD COLUMN itemCode INT;
 
--- UPDATE item_simulator.CharacterInventory ci
--- JOIN item_simulator.Items i 
--- ON ci.itemId = i.itemId
--- SET ci.itemName = i.itemName;
+UPDATE item_simulator.BasicItems ci
+JOIN item_simulator.Items i 
+ON ci.itemId = i.itemId
+SET ci.itemCode = i.itemCode;
