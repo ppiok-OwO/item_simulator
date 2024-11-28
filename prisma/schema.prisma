@@ -38,6 +38,7 @@ model BasicItems {
   basicitemId Int      @id @default(autoincrement()) @map("basicitemId")
   itemId      Int      @unique @map("itemId")
   classId     Int      @unique @map("classId")
+  itemCode    Int
   createdAt   DateTime @default(now()) @map("createdAt")
   updatedAt   DateTime @updatedAt @map("updatedAt")
 
