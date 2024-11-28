@@ -17,6 +17,9 @@ router.post('/classes', authMiddleware, async (req, res, next) => {
     req.body;
   // 운영자만이 클래스를 추가할 수 있다.
   const { userId } = req.locals;
+  const user = await prisma.accounts.findUnique({
+    where: { userId },
+  });
 
   try {
     // 데이터 유효성 검사
@@ -24,12 +27,7 @@ router.post('/classes', authMiddleware, async (req, res, next) => {
       return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
     }
     // 운영자 권한 확인
-    if (
-      !(
-        adminId === process.env.ADMIN_ID &&
-        adminPassword === process.env.ADMIN_PASSWORD
-      )
-    ) {
+    if (!user.isAdmin) {
       return res.status(400).json({ message: '권한을 가지고 있지 않습니다.' });
     }
 

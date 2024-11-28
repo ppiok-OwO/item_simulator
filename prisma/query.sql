@@ -1,7 +1,7 @@
 -- SELECT * FROM `item_simulator`.`Accounts` LIMIT 1000;
 -- SELECT * FROM `item_simulator`.`Classes` LIMIT 1000;
-SELECT * FROM `item_simulator`.`Items` LIMIT 1000;
--- SELECT * FROM `item_simulator`.`Characters` LIMIT 1000;
+-- SELECT * FROM `item_simulator`.`Items` LIMIT 1000;
+SELECT * FROM `item_simulator`.`Characters` LIMIT 1000;
 -- SELECT * FROM `item_simulator`.`CharacterItems` LIMIT 1000;
 -- SELECT * FROM `item_simulator`.`CharacterInventory` LIMIT 1000;
 
@@ -14,6 +14,6 @@ SELECT * FROM `item_simulator`.`Items` LIMIT 1000;
 -- DROP TABLE Classes, BasicItems, Items, Characters, CharacterInventory, CharacterItems;
 -- DROP TABLE Items;
 
--- UPDATE Characters
+-- UPDATE item_simulator.Characters
 -- SET characterMoney = 10000000
--- WHERE characterId = 17
+-- WHERE accountId = 5

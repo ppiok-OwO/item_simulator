@@ -104,6 +104,7 @@ router.get('/items', async (req, res, next) => {
     // 아이템 코드, 아이템 명, 아이템 가격 조회
     const itemList = await prisma.items.findMany({
       select: {
+        itemId: true,
         itemCode: true,
         itemName: true,
         itemPrice: true,

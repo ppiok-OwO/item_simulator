@@ -104,7 +104,7 @@ model Classes {
 model CharacterItems {
   characterItemId Int      @id @default(autoincrement()) @map("characterItemId")
   characterId     Int      @map("characterId")
-  itemId          Int      @map("itemId")
+  itemId          Int      @unique @map("itemId")
   createdAt       DateTime @default(now()) @map("createdAt")
   updatedAt       DateTime @updatedAt @map("updatedAt")
 
@@ -117,12 +117,12 @@ model CharacterItems {
 model CharacterInventory {
   characterInventoryId Int      @id @default(autoincrement()) @map("characterInventoryId")
   characterId          Int      @map("characterId")
-  itemId               Int      @map("itemId")
+  itemId               Int      @unique @map("itemId")
   createdAt            DateTime @default(now()) @map("createdAt")
   updatedAt            DateTime @updatedAt @map("updatedAt")
 
   character Characters @relation(fields: [characterId], references: [characterId], onDelete: Cascade)
-  itemById  Items      @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
+  item      Items      @relation(fields: [itemId], references: [itemId], onDelete: Cascade)
 
   @@map("CharacterInventory")
 }
