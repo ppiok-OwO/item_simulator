@@ -3,8 +3,8 @@
 ## 소개하기에 앞서...
 
 1. Insomnia 폴더 안에 들어있는 json 파일을 Insomnia 콜렉션에 import해주세요!
-2. 환경 변수 내보내기에 오류가 있는 건지, 외부에서 json 파일로 접근했을 때 간헐적으로 설정이 제대로 되지 않을 때가 있습니다. 혹시 그런 경우가 발생한다면 환경 변수 "authorizaion"의 값을 "Response=>Header"로 재설정 부탁드립니다.</br>
-![환경 변수](src/images/image.png)
+2. 환경 변수 내보내기에 세부설정은 포함이 안 되는 건지, 외부에서 json 파일로 접근했을 때 환경 변수 설정이 풀려버리는 현상이 있습니다. 혹시 그런 경우가 발생한다면 환경 변수 "authorizaion"의 값을 "Response=>Header", "Request는 POST 로그인 API"로 재설정 부탁드립니다.</br>
+![img](src/images/image.png)
 3. 비교 테스트를 위한 운영자 계정의 ID와 비밀번호 아래와 같습니다.
 
 ```
