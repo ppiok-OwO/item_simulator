@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "format": "prettier --write *.js **/*.js",
-    "dev": "npx nodemon src/app.js"
+    "dev": "npx nodemon src/app.js",
+    "start": "pm2 src/app.js"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
