@@ -15,12 +15,10 @@ router.post('/sign-up', async (req, res, next) => {
   try {
     // 회원가입에 필요한 정보들을 모두 입력했는지 확인
     if (!userId || !password || !passwordCheck || !userName) {
-      return res
-        .status(400)
-        .json({
-          message:
-            '사용자ID, 비밀번호, 비밀번호 확인, 사용자 이름을 입력해 주세요.',
-        });
+      return res.status(400).json({
+        message:
+          '사용자ID, 비밀번호, 비밀번호 확인, 사용자 이름을 입력해 주세요.',
+      });
     }
 
     // ID 유효성 검사
@@ -74,6 +72,7 @@ router.post('/sign-up', async (req, res, next) => {
     // DB에 회원가입 정보를 생성
     await prisma.accounts.create({
       data: {
+        accountId,
         userId,
         password: hashedPassword,
         userName,
@@ -82,7 +81,7 @@ router.post('/sign-up', async (req, res, next) => {
 
     return res.status(201).json({
       message: '계정이 성공적으로 생성되었습니다.',
-      data: { userId, userName },
+      data: { accountId, userId, userName },
     });
   } catch (err) {
     next(err);
@@ -150,9 +149,10 @@ router.post('/sign-in', async (req, res, next) => {
     // authorization헤더에 Bearer 토큰을 담아서 유저에게 응답합니다.
     res.setHeader('authorization', `Bearer ${accessToken}`);
 
-    return res
-      .status(200)
-      .json({ message: '로그인 성공. Token이 정상적으로 발급되었습니다.' });
+    return res.status(200).json({
+      message: '로그인 성공. Token이 정상적으로 발급되었습니다.',
+      accountId: user.accountId,
+    });
   } catch (err) {
     next(err);
   }
@@ -174,6 +174,7 @@ router.get('/accounts/characters/:accountId', async (req, res, next) => {
     const characterList = await prisma.characters.findMany({
       where: { accountId: +accountId },
       select: {
+        characterId: true,
         characterName: true,
         class: {
           select: {

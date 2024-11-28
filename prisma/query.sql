@@ -21,7 +21,7 @@
 -- ALTER TABLE item_simulator.BasicItems
 -- ADD COLUMN itemCode INT;
 
-UPDATE item_simulator.BasicItems ci
-JOIN item_simulator.Items i 
-ON ci.itemId = i.itemId
-SET ci.itemCode = i.itemCode;
+-- UPDATE item_simulator.BasicItems ci
+-- JOIN item_simulator.Items i 
+-- ON ci.itemId = i.itemId
+-- SET ci.itemCode = i.itemCode;

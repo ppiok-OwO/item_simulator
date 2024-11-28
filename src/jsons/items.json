@@ -61,5 +61,26 @@
     "itemStat": { "hp": 350, "power": 75, "cd": 15 },
     "itemPrice": 2950,
     "classId": 3
+  },
+  "item10": {
+    "itemCode": 10,
+    "itemName": "스테락의 도전",
+    "itemStat": { "hp": 400, "power": 45 },
+    "itemPrice": 3200,
+    "classId": 1
+  },
+  "item11": {
+    "itemCode": 11,
+    "itemName": "그림자 검",
+    "itemStat": { "cd": 10, "power": 65 },
+    "itemPrice": 2600,
+    "classId": 2
+  },
+  "item12": {
+    "itemCode": 12,
+    "itemName": "슈렐리아의 군가",
+    "itemStat": { "cd": 15, "power": 50 },
+    "itemPrice": 2200,
+    "classId": 4
   }
 }
