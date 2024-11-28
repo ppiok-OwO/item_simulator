@@ -252,6 +252,33 @@ async function verifyToken(authorization) {
   }
 }
 
+/** 모든 캐릭터 조회 API */
+// 테스트를 돕기 위한 API입니다. 인증된 사용자만 조회할 수 있습니다.
+router.get('/characters', authMiddleware, async (req, res, next) => {
+  try {
+    const { userId } = req.locals;
+    const user = await prisma.accounts.findUnique({
+      where: { userId: userId },
+    });
+    if (!user) {
+      return res.status(403).json({ message: '권한을 가지고 있지 않습니다.' });
+    }
+
+    const allCharacters = await prisma.characters.findMany({
+      select: {
+        accountId: true,
+        characterId: true,
+        characterName: true,
+        classId: true,
+      },
+    });
+
+    return res.status(200).json(allCharacters);
+  } catch (err) {
+    next(err);
+  }
+});
+
 /**========================================= */
 /** 캐릭터 삭제 API */
 router.delete(
