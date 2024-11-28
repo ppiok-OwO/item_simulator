@@ -78,6 +78,9 @@ router.patch(
               data: {
                 characterId: character.characterId,
                 itemId: purchasedItem.itemId,
+                itemCode: purchasedItem.itemCode,
+                itemPrice: purchasedItem.itemPrice,
+                itemName: purchasedItem.itemName,
               },
             });
 

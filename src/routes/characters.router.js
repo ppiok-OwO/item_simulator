@@ -151,6 +151,7 @@ export async function equipItem(tx, character, item) {
     data: {
       characterId: character.characterId,
       itemId: item.itemId,
+      itemCode: item.itemCode,
     },
   });
   // 아이템의 스탯만큼 캐릭터에게 부여
@@ -197,9 +198,16 @@ router.get('/characters/:characterId', async (req, res, next) => {
     if (!character) {
       return res.status(404).json({ message: '존재하지 않는 캐릭터입니다.' });
     }
+    const { className } = await prisma.classes.findFirst({
+      where: { classId: character.classId },
+      select: {
+        className: true,
+      },
+    });
 
     // 기본 응답 데이터
     let data = {
+      className: className,
       characterName: character.characterName,
       characterHp: character.characterHp,
       characterPower: character.characterPower,
@@ -491,11 +499,11 @@ router.patch(
   async (req, res, next) => {
     const { characterId } = req.params;
     const { userId } = req.locals;
-    const { itemId } = req.body;
+    const { itemCode } = req.body;
 
     try {
       // 필수 입력값을 모두 받았는지 확인
-      if (!itemId) {
+      if (!itemCode) {
         return res.status(400).json({ error: '아이템 ID를 입력해 주세요.' });
       }
 
@@ -515,24 +523,34 @@ router.patch(
           }
 
           // 조건에 맞는 아이템을 조회
-          const item = await prisma.items.findFirst({
+          const isValidItem = await prisma.characterItems.findFirst({
             where: {
-              itemId: +itemId,
+              itemCode: +itemCode,
               characterId: +characterId,
             },
           });
-          if (!item) {
+          if (!isValidItem) {
             return res.status(404).json({
               message: '장착되지 않은 아이템입니다.',
             });
           }
+
+          const item = await prisma.items.findUnique({
+            where: { itemId: isValidItem.itemId },
+          });
 
           // 아이템 장착 해제
           await unEquipItem(tx, character, item);
 
           // 인벤토리에 아이템 추가
           await tx.characterInventory.create({
-            data: { characterId: character.characterId, itemId: +itemId },
+            data: {
+              characterId: character.characterId,
+              itemId: +item.itemId,
+              itemCode: +itemCode,
+              itemPrice: item.itemPrice,
+              itemName: item.itemName,
+            },
           });
 
           // 업데이트된 DB를 반영하여 캐릭터를 불러온다.

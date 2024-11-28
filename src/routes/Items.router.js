@@ -16,7 +16,10 @@ router.post('/items', authMiddleware, async (req, res, next) => {
     });
 
     if (!itemCode || !itemName || !itemStat | !itemPrice || !classId) {
-      return res.status(400).json({ message: '아이템 코드, 아이템 이름, 아이템 스탯, 아이템 가격, 클래스ID를 입력해 주세요.' });
+      return res.status(400).json({
+        message:
+          '아이템 코드, 아이템 이름, 아이템 스탯, 아이템 가격, 클래스ID를 입력해 주세요.',
+      });
     }
 
     // 일반 유저는 기존에 존재하던 아이템만 생성할 수 있다.
@@ -66,18 +69,25 @@ router.patch('/basicitems', authMiddleware, async (req, res, next) => {
     });
 
     if (!itemId || !classId) {
-      return res.status(400).json({ message: '아이템ID와 클래스ID를 입력해 주세요.' });
+      return res
+        .status(400)
+        .json({ message: '아이템ID와 클래스ID를 입력해 주세요.' });
     }
     // 운영자 권한 확인
     if (!user.isAdmin) {
       return res.status(403).json({ message: '권한을 가지고 있지 않습니다.' });
     }
 
+    const item = await prisma.items.findFirst({
+      where: { itemId: +itemId },
+    });
+
     const basicitem = await prisma.basicItems.update({
       where: { classId: +classId },
       data: {
-        itemId: +itemId,
-        classId: +classId,
+        itemId: item.itemId,
+        classId: item.classId,
+        itemCode: item.itemCode,
       },
     });
 
