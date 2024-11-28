@@ -1,4 +1,7 @@
 # 『 프로젝트 - 아이템 시뮬레이터 』
+## 소개하기에 앞서...
+1. Insomnia 폴더 안에 들어있는 json 파일을 Insomnia 콜렉션에 import해주세요!
+2. 터미널 실행 명령어는 yarn dev 입니다!
 ## 프로젝트 소개
 백엔드 개발자로 한걸음 내딛기 위한 미니 프로젝트!</br>
 Node.js의 express 모듈을 활용하여 아이템 시뮬레이터를 만들어 봅시다. 이 프로젝트에서 필수로 구현해야 하는 기능은 아래와 같습니다.
@@ -106,6 +109,8 @@ CharactersInventory : 캐릭터가 보유하고 있는 아이템 테이블(아�
 ![img_title](src/images/image1.png)
 - 업데이트된 모델링
 ![img_title](src/images/image2.png)
+- 모델링 최종 형태(DBeaver 관계도)
+![img_title](src/images/item_simulator%20-%20TABLES.png)
 ## API 구현하기
 ### 계정 생성(회원 가입) API
 - [x] req.body로부터 id, 비밀번호, 비밀번호 확인, 이름을 넘겨 받는다. ✅ 2024-11-25

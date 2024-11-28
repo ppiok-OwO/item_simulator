@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import cookieParser from 'cookie-parser';
 import { prisma } from '../utils/prisma/index.js';
 
 dotenv.config();
@@ -19,7 +18,7 @@ export default async function (req, res, next) {
     // 2. Bearer 토큰 형식인지 확인
     const [tokenType, token] = authorization.split(' ');
     if (tokenType !== 'Bearer' || !token) {
-      return res.status(400).json({
+      return res.status(401).json({
         message: '토큰 타입이 Bearer 형식이 아니거나 누락되었습니다.',
       });
     }

@@ -24,6 +24,12 @@ router.patch(
         where: { userId },
       });
 
+      if (!itemCode || !count) {
+        return res
+          .status(400)
+          .json({ message: '아이템코드와 수량을 입력해주세요.' });
+      }
+
       // 계정이 소유한 캐릭터가 맞는지 검사
       const character = await prisma.characters.findUnique({
         where: { characterId: +characterId, accountId: user.accountId },
@@ -34,7 +40,7 @@ router.patch(
           .json({ message: '계정이 소유하고 있는 캐릭터가 아닙니다.' });
       }
 
-      // 아이템 유효성 검사
+      // 아이템 코드 유효성 검사
       const item = await prisma.items.findFirst({
         where: { itemCode: +itemCode },
       });
@@ -126,6 +132,12 @@ router.delete(
       const user = await prisma.accounts.findUnique({
         where: { userId },
       });
+
+      if (!itemCode || !count) {
+        return res
+          .status(400)
+          .json({ message: '아이템코드와 수량을 입력해주세요.' });
+      }
 
       // 계정이 소유한 캐릭터가 맞는지 검사
       const character = await prisma.characters.findUnique({

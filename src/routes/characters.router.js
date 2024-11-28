@@ -11,18 +11,17 @@ const router = express.Router();
 
 /** 캐릭터 생성 API */
 router.post('/characters', authMiddleware, async (req, res, next) => {
-  const { characterName, classId } = req.body;
-  const { userId } = req.locals;
-  const user = await prisma.accounts.findUnique({
-    where: { userId },
-  });
-
   try {
+    const { characterName, classId } = req.body;
+    const { userId } = req.locals;
+    const user = await prisma.accounts.findUnique({
+      where: { userId },
+    });
     // 필수 입력값을 모두 받았는지 확인
     if (!characterName || !classId || !characterName.trim().length === 0) {
       return res
         .status(400)
-        .json({ error: '캐릭터 정보를 모두 입력해 주세요.' });
+        .json({ error: '생성할 캐릭터의 이름과 클래스ID를 입력해 주세요.' });
     }
 
     // 캐릭터 이름 유효성 검사
@@ -112,14 +111,6 @@ router.post('/characters', authMiddleware, async (req, res, next) => {
             itemPrice,
             classId,
             characterId: character.characterId,
-          },
-        });
-
-        // 기본 아이템 장착
-        await tx.characterItems.create({
-          data: {
-            characterId: character.characterId,
-            itemId: item.itemId,
           },
         });
 
@@ -417,6 +408,11 @@ router.patch(
     const { itemCode } = req.body;
 
     try {
+      // 필수 입력값을 모두 받았는지 확인
+      if (!itemCode) {
+        return res.status(400).json({ error: '아이템 코드를 입력해 주세요.' });
+      }
+
       const { updatedCharacter } = await prisma.$transaction(
         async (tx) => {
           const user = await prisma.accounts.findUnique({
@@ -441,8 +437,9 @@ router.patch(
             },
           });
           if (!item) {
-            return res.status(404).json({
-              message: '장착할 수 없는 아이템입니다.',
+            return res.status(400).json({
+              message:
+                '소유하지 않았거나, 현재 캐릭터가 장착할 수 없는 아이템입니다.',
             });
           }
 
@@ -501,6 +498,11 @@ router.patch(
     const { itemId } = req.body;
 
     try {
+      // 필수 입력값을 모두 받았는지 확인
+      if (!itemId) {
+        return res.status(400).json({ error: '아이템 ID를 입력해 주세요.' });
+      }
+
       const { updatedCharacter } = await prisma.$transaction(
         async (tx) => {
           const user = await prisma.accounts.findUnique({
@@ -562,36 +564,5 @@ router.patch(
     }
   },
 );
-// router.patch(
-//   '/characters/unEquip/:characterId',
-//   authMiddleware,
-//   async (req, res, next) => {
-//     const { characterId } = req.params;
-//     const { userId } = req.locals;
-
-//     try {
-//       const user = await prisma.accounts.findUnique({
-//         where: { userId },
-//       });
-//       const character = await prisma.characters.findUnique({
-//         where: { characterId: +characterId },
-//       });
-
-//       // 유효성 검사
-//       if (!user) {
-//         return res
-//           .status(404)
-//           .json({ message: '로그인 계정이 존재하지 않습니다.' });
-//       }
-//       if (user.accountId !== character.accountId && !user.isAdmin) {
-//         return res.status(403).json({
-//           message: '다른 계정이 소유한 캐릭터입니다.',
-//         });
-//       }
-//     } catch (err) {
-//       next(err);
-//     }
-//   },
-// );
 
 export default router;

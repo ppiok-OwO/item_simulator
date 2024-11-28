@@ -17,7 +17,7 @@ router.post('/sign-up', async (req, res, next) => {
     if (!userId || !password || !passwordCheck || !userName) {
       return res
         .status(400)
-        .json({ message: '사용자 정보를 모두 입력해 주세요.' });
+        .json({ message: '사용자ID, 비밀번호, 비밀번호 확인, 사용자 이름을 입력해 주세요.' });
     }
 
     // ID 유효성 검사
@@ -96,7 +96,7 @@ router.post('/sign-in', async (req, res, next) => {
     if (!userId || !password) {
       return res
         .status(400)
-        .json({ error: '로그인 정보를 모두 입력해 주세요.' });
+        .json({ error: '사용자ID, 비밀번호를 입력해 주세요.' });
     }
     // ID 유효성 검사
     const isValidUserId = /^[a-z0-9]+$/.test(userId);

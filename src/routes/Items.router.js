@@ -1,34 +1,26 @@
 import express from 'express';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../utils/prisma/index.js';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
 import authMiddleware from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
 /** 아이템 생성 API */
 router.post('/items', authMiddleware, async (req, res, next) => {
-  // 아이템 코드, 이름, 스탯, 가격을 request로 전달받기
-  const { itemCode, itemName, itemStat, itemPrice, classId } = req.body;
-  // 운영자만이 새로운 아이템을 추가할 수 있다.
-  const { adminId, adminPassword } = req.body;
-
   try {
-    // 데이터 유효성 검사
+    // 아이템 코드, 이름, 스탯, 가격을 request로 전달받기
+    const { itemCode, itemName, itemStat, itemPrice, classId } = req.body;
+    const { userId } = req.locals;
+    const user = await prisma.accounts.findUnique({
+      where: { userId },
+    });
+
     if (!itemCode || !itemName || !itemStat | !itemPrice || !classId) {
-      return res.status(400).json({ message: '모든 필드를 입력해 주세요.' });
+      return res.status(400).json({ message: '아이템 코드, 아이템 이름, 아이템 스탯, 아이템 가격, 클래스ID를 입력해 주세요.' });
     }
 
-    // 운영자ID와 비밀번호를 입력하지 않았을 때, DB에 존재하는 아이템만 추가가 가능하다.
-    if (
-      !(
-        adminId === process.env.ADMIN_ID &&
-        adminPassword === process.env.ADMIN_PASSWORD
-      )
-    ) {
+    // 일반 유저는 기존에 존재하던 아이템만 생성할 수 있다.
+    if (!user.isAdmin) {
       const isValidItem = await prisma.items.findFirst({
         where: {
           itemCode: +itemCode,
@@ -45,7 +37,7 @@ router.post('/items', authMiddleware, async (req, res, next) => {
       }
     }
 
-    // 아이템 레코드 생성
+    // 운영자는 새로운 아이템을 추가할 수 있다.
     const item = await prisma.items.create({
       data: {
         itemCode: +itemCode,
@@ -62,29 +54,27 @@ router.post('/items', authMiddleware, async (req, res, next) => {
   }
 });
 
-/** 클래스별 기본 아이템 생성 API */
-router.post('/basicitems', authMiddleware, async (req, res, next) => {
-  // 아이템 id, 클래스 id를 request로 전달받기
-  const { itemId, classId } = req.body;
-  // 운영자만이 클래스별 기본 아이템을 추가할 수 있다.
-  const { adminId, adminPassword } = req.body;
-
+/** 클래스별 기본 아이템 설정 API */
+router.patch('/basicitems', authMiddleware, async (req, res, next) => {
   try {
-    // 데이터 유효성 검사
+    // 아이템 id, 클래스 id를 request로 전달받기
+    const { itemId, classId } = req.body;
+    // 운영자만이 클래스별 기본 아이템을 설정할 수 있다.
+    const { userId } = req.locals;
+    const user = await prisma.accounts.findUnique({
+      where: { userId },
+    });
+
     if (!itemId || !classId) {
-      return res.status(400).json({ message: '모든 필드를 입력해 주세요.' });
+      return res.status(400).json({ message: '아이템ID와 클래스ID를 입력해 주세요.' });
     }
     // 운영자 권한 확인
-    if (
-      !(
-        adminId === process.env.ADMIN_ID &&
-        adminPassword === process.env.ADMIN_PASSWORD
-      )
-    ) {
-      return res.status(400).json({ message: '권한을 가지고 있지 않습니다.' });
+    if (!user.isAdmin) {
+      return res.status(403).json({ message: '권한을 가지고 있지 않습니다.' });
     }
 
-    const basicitem = await prisma.basicItems.create({
+    const basicitem = await prisma.basicItems.update({
+      where: { classId: +classId },
       data: {
         itemId: +itemId,
         classId: +classId,
@@ -150,19 +140,15 @@ router.get('/items/:itemCode', async (req, res, next) => {
 //==========================/
 /** 아이템 수정 API */
 router.patch('/items/:itemCode', authMiddleware, async (req, res, next) => {
-  const { itemCode } = req.params;
-  const { itemName, itemStat } = req.body;
-  const { adminId, adminPassword } = req.body;
-
   try {
+    const { itemCode } = req.params;
+    const { itemName, itemStat } = req.body;
+    const { userId } = req.locals;
+    const user = await prisma.accounts.findUnique({ where: { userId } });
+
     // 운영자 권한 확인
-    if (
-      !(
-        adminId === process.env.ADMIN_ID &&
-        adminPassword === process.env.ADMIN_PASSWORD
-      )
-    ) {
-      return res.status(400).json({ message: '권한을 가지고 있지 않습니다.' });
+    if (!user.isAdmin) {
+      return res.status(403).json({ message: '권한을 가지고 있지 않습니다.' });
     }
 
     // 아이템 코드 유효성 검사

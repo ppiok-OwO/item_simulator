@@ -105,6 +105,7 @@ model CharacterItems {
   characterItemId Int      @id @default(autoincrement()) @map("characterItemId")
   characterId     Int      @map("characterId")
   itemId          Int      @unique @map("itemId")
+  itemCode        Int
   createdAt       DateTime @default(now()) @map("createdAt")
   updatedAt       DateTime @updatedAt @map("updatedAt")
 
@@ -118,6 +119,9 @@ model CharacterInventory {
   characterInventoryId Int      @id @default(autoincrement()) @map("characterInventoryId")
   characterId          Int      @map("characterId")
   itemId               Int      @unique @map("itemId")
+  itemName             String
+  itemCode             Int
+  itemPrice            Int
   createdAt            DateTime @default(now()) @map("createdAt")
   updatedAt            DateTime @updatedAt @map("updatedAt")
 
