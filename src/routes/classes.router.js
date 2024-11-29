@@ -120,7 +120,9 @@ router.patch('/classes/:classId', authMiddleware, async (req, res, next) => {
     });
 
     return res.status(201).json(updatedClass);
-  } catch (err) {}
+  } catch (err) {
+    next(err)
+  }
 });
 
 export default router;
